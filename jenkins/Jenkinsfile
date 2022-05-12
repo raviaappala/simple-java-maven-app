@@ -60,7 +60,11 @@ pipeline {
                         CONTAINER="k8s-debian-test"
                         
                         IMAGE_DIGEST=$(docker image inspect sureshrao/\$CONTAINER:latest -f '{{join .RepoDigests ","}}')
-                        # Customize image 
+			
+			## Create application in Argocd
+			#argocd app create guestbook --repo https://github.com/raviaappala/simple-java-maven-app.git --path manidee --dest-namespace default --dest-server https://kubernetes.default.svc --directory-recurse
+                        argocd app create kustomize-guestbook --repo https://github.com/raviaappala/simple-java-maven-app.git --path manifests --dest-namespace default --dest-server https://kubernetes.default.svc --kustomize-image $IMAGE_DIGEST
+			# Customize image 
                         ARGOCD_SERVER=$ARGOCD_SERVER argocd --insecure --grpc-web app set $APP_NAME --kustomize-image $IMAGE_DIGEST
            
                         # Deploy to ArgoCD
